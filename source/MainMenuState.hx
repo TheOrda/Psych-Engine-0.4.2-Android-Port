@@ -186,7 +186,7 @@ class MainMenuState extends MusicBeatState
 		var lerpVal:Float = CoolUtil.boundTo(elapsed * 5.6, 0, 1);
 		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
 		
-		if (eee)
+		if ()
 		{
 			var finalKey:FlxKey = FlxG.keys.firstJustPressed();
 			if(finalKey != FlxKey.NONE) {
