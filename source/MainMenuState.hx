@@ -379,14 +379,3 @@ class MainMenuState extends MusicBeatState
 			}
 		});
 	}
-
-  #if ACHIEVEMENTS_ALLOWED
-  // Unlocks "Freaky on a Friday Night" achievement
-  function giveAchievement() {
-    add(new AchievementObject('aqui_esta_tu_vieja_mira_como_me_la_cacho'));
-    FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
-    trace('Giving achievement "aqui_esta_tu_vieja_mira_como_me_la_cacho"');
-  }
-  #end
-
-}
