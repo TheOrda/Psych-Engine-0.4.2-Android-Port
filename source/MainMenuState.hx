@@ -37,7 +37,7 @@ class MainMenuState extends MusicBeatState
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
 	
-	var bfGlitch:FlxSprite;
+  var bfGlitch:FlxSprite;
 	
 	var bop1:FlxTween;
 	var bop2:FlxTween;
@@ -114,6 +114,11 @@ class MainMenuState extends MusicBeatState
 		add(camFollow);
 		add(camFollowPos);
 
+		camFollow = new FlxObject(0, 0, 1, 1);
+		camFollowPos = new FlxObject(0, 0, 1, 1);
+		add(camFollow);
+		add(camFollowPos);
+
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
@@ -159,6 +164,15 @@ class MainMenuState extends MusicBeatState
 
 		super.create();
 	}
+
+	#if ACHIEVEMENTS_ALLOWED
+	// Unlocks "Freaky on a Friday Night" achievement
+	function giveAchievement() {
+		add(new AchievementObject('friday_night_play', camAchievement));
+		FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+		trace('Giving achievement "friday_night_play"');
+	}
+	#end
 
 	var selectedSomethin:Bool = false;
 
@@ -295,64 +309,33 @@ class MainMenuState extends MusicBeatState
 								switch (daChoice)
 								{
 									case 'story_mode':
-										FlxG.camera.follow(fp);
-										FlxTween.tween(fp, {x: 890}, 3, {ease: FlxEase.quadInOut}); 
-										FlxTween.tween(FlxG.camera, {zoom: 2.3}, 3, {
-											ease: FlxEase.quadInOut,
-											onComplete: function(twn:FlxTween)
-											{
-												FlxG.sound.music.fadeOut(1.8, 0);
-												FlxG.camera.fade(FlxColor.BLACK, 1.8, false, function()
-												{
-													MusicBeatState.switchState(new StoryMenuState());
-												});
-											}
-										});
+										MusicBeatState.switchState(new StoryMenuState());
 									case 'freeplay':
-										FlxG.camera.follow(fp);
-										FlxG.sound.music.fadeOut(1.5, 0);
-										FlxTween.tween(fp, {x: -1000}, 1.3, {
-											ease: FlxEase.sineInOut,
-											onComplete: function(twn:FlxTween)
-											{
-												MusicBeatState.switchState(new FreeplayState());
-											}
-										});
-									#if MODS_ALLOWED
-									case 'mods':
-										MusicBeatState.switchState(new ModsMenuState());
-									#end
+										MusicBeatState.switchState(new FreeplayState());
 									case 'awards':
 										MusicBeatState.switchState(new AchievementsMenuState());
 									case 'credits':
 										MusicBeatState.switchState(new CreditsState());
 									case 'options':
-										FlxG.camera.follow(fp);
-										transitioning = true;
-										FlxTransitionableState.skipNextTransIn = true;
-										FlxTransitionableState.skipNextTransOut = true;
-										FlxTween.tween(bg, {x: 1489}, 1.3, {ease: FlxEase.sineInOut});
-										FlxTween.tween(frontBG, {x: 1489}, 1.3, {ease: FlxEase.sineInOut});
-										FlxTween.tween(fp, {x: 2000}, 1.3, {
-											ease: FlxEase.sineInOut,
-											onComplete: function(twn:FlxTween)
-											{
-												MusicBeatState.switchState(new options.OptionsState());
-											}
-										});
+										MusicBeatState.switchState(new OptionsState());
 								}
 							});
 						}
 					});
 				}
 			}
-		}
 			else if (FlxG.keys.justPressed.SEVEN #if mobileC || _virtualpad.buttonC.justPressed #end)
 			{
 				selectedSomethin = true;
 				MusicBeatState.switchState(new MasterEditorMenu());
 			}
 		}
+
+		super.update(elapsed);
+
+		menuItems.forEach(function(spr:FlxSprite)
+		{
+		});
 	}
 
 	function changeItem(huh:Int = 0)
@@ -367,6 +350,7 @@ class MainMenuState extends MusicBeatState
 		menuItems.forEach(function(spr:FlxSprite)
 		{
 			spr.animation.play('idle');
+			spr.offset.y = 0;
 			spr.updateHitbox();
 
 			if (spr.ID == curSelected)
@@ -379,3 +363,4 @@ class MainMenuState extends MusicBeatState
 			}
 		});
 	}
+}
