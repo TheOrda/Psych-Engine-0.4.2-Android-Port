@@ -353,13 +353,6 @@ class MainMenuState extends MusicBeatState
 				MusicBeatState.switchState(new MasterEditorMenu());
 			}
 		}
-    {
-		super.update(elapsed);
-
-		menuItems.forEach(function(spr:FlxSprite)
-    }
-		{
-		});
 	}
 
 	function changeItem(huh:Int = 0)
