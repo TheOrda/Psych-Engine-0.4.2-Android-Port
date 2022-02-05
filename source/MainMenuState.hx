@@ -36,6 +36,17 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 	var camFollowPos:FlxObject;
+	
+	var bfGlitch:FlxSprite;
+	
+	var bop1:FlxTween;
+	var bop2:FlxTween;
+	
+  public var fp:FlxSprite;
+	public var bg:FlxSprite;
+	public var frontBG:FlxSprite;
+	
+  public var transitioning:Bool = false;
 
 	override function create()
 	{
@@ -65,6 +76,38 @@ class MainMenuState extends MusicBeatState
 		bg.screenCenter();
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
+		
+		function bop(bg:FlxSprite):Void {
+			bop1 = FlxTween.tween(bg, {x: -5}, 5, {
+				ease: FlxEase.quadInOut,
+				onComplete: function(tween:FlxTween)
+				{
+					bop2 = FlxTween.tween(bg, {x: 5}, 5, {
+						ease: FlxEase.quadInOut,
+						onComplete: function(tween:FlxTween)
+						{
+							bop(bg);
+						}
+					});
+				}
+			});
+		}
+
+		bop(bg);
+
+		var logo:FlxSprite = new FlxSprite(10, 0).loadGraphic(Paths.image('titlelogo'));
+		logo.scale.set(0.7, 0.7);
+		logo.antialiasing = ClientPrefs.globalAntialiasing;
+		logo.updateHitbox();
+		add(logo);
+
+		bfGlitch = new FlxSprite(770, 210);
+		bfGlitch.frames = Paths.getSparrowAtlas('mainmenu/menu-bf-glitch');
+		bfGlitch.animation.addByPrefix('idle', 'Symbol 1', 24);
+		bfGlitch.animation.play('idle');
+		bfGlitch.scale.set(1.15, 1.15);
+		bfGlitch.updateHitbox();
+		add(bfGlitch);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		camFollowPos = new FlxObject(0, 0, 1, 1);
@@ -106,31 +149,9 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, "Psych Engine v" + psychEngineVersion, 12);
-		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		add(versionShit);
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Friday Night Funkin' v" + Application.current.meta.get('version'), 12);
-		versionShit.scrollFactor.set();
-		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		add(versionShit);
-
 		// NG.core.calls.event.logEvent('swag').send();
 
 		changeItem();
-
-		#if ACHIEVEMENTS_ALLOWED
-		Achievements.loadAchievements();
-		var leDate = Date.now();
-		if (leDate.getDay() == 5 && leDate.getHours() >= 18) {
-			var achieveID:Int = Achievements.getAchievementIndex('friday_night_play');
-			if(!Achievements.isAchievementUnlocked(Achievements.achievementsStuff[achieveID][2])) { //It's a friday night. WEEEEEEEEEEEEEEEEEE
-				Achievements.achievementsMap.set(Achievements.achievementsStuff[achieveID][2], true);
-				giveAchievement();
-				ClientPrefs.saveSettings();
-			}
-		}
-		#end
 
 		#if mobileC
 		addVirtualPad(UP_DOWN, A_B_C);
@@ -138,15 +159,6 @@ class MainMenuState extends MusicBeatState
 
 		super.create();
 	}
-
-	#if ACHIEVEMENTS_ALLOWED
-	// Unlocks "Freaky on a Friday Night" achievement
-	function giveAchievement() {
-		add(new AchievementObject('friday_night_play', camAchievement));
-		FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
-		trace('Giving achievement "friday_night_play"');
-	}
-	#end
 
 	var selectedSomethin:Bool = false;
 
@@ -159,6 +171,74 @@ class MainMenuState extends MusicBeatState
 
 		var lerpVal:Float = CoolUtil.boundTo(elapsed * 5.6, 0, 1);
 		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
+		
+		if (eee)
+		{
+			var finalKey:FlxKey = FlxG.keys.firstJustPressed();
+			if(finalKey != FlxKey.NONE) {
+				lkp.push(finalKey); //Convert int to FlxKey
+				if(lkp.length > tesla.length || lkp.length > sega.length)
+				{
+					lkp.shift();
+				}
+				
+				if(lkp.length == tesla.length)
+				{
+					var isDifferent:Bool = false;
+					for (i in 0...lkp.length) {
+						if(lkp[i] != tesla[i]) {
+							isDifferent = true;
+							break;
+						}
+					}
+
+					if(!isDifferent)
+					{
+						FlxG.sound.pause();
+						selectedSomethin = true;
+						bfGlitch.visible = false;
+						(new FlxVideo(Paths.video('aquiestatuv9iejainutilmiracomomelacachoooooh'))).finishCallback = function() {
+							isDifferent = true;
+							selectedSomethin = false;
+							FlxG.sound.resume();
+							bfGlitch.visible = true;
+						}
+
+						#if ACHIEVEMENTS_ALLOWED
+						var achieveID:Int = Achievements.getAchievementIndex('aqui_esta_tu_vieja_mira_como_me_la_cacho');
+						if(!Achievements.isAchievementUnlocked(Achievements.achievementsStuff[achieveID][16])) { //aquiestatuviejainutilmiracomomelacachotomeseñoraoooooo
+							Achievements.achievementsMap.set(Achievements.achievementsStuff[achieveID][16], true);
+							giveAchievement();
+							ClientPrefs.saveSettings();
+						}
+						#end
+					}
+				}
+				else if(lkp.length == sega.length)
+				{
+					var isDifferent:Bool = false;
+					for (i in 0...lkp.length) {
+						if(lkp[i] != sega[i]) {
+							isDifferent = true;
+							break;
+						}
+					}
+
+					if(!isDifferent)
+					{
+						FlxG.sound.pause();
+						selectedSomethin = true;
+						bfGlitch.visible = false;
+						(new FlxVideo(Paths.video('mcsonic'))).finishCallback = function() {
+							isDifferent = true;
+							selectedSomethin = false;
+							FlxG.sound.resume();
+							bfGlitch.visible = true;
+						}
+					}
+				}
+			}
+		}
 
 		if (!selectedSomethin)
 		{
@@ -215,21 +295,58 @@ class MainMenuState extends MusicBeatState
 								switch (daChoice)
 								{
 									case 'story_mode':
-										MusicBeatState.switchState(new StoryMenuState());
+										FlxG.camera.follow(fp);
+										FlxTween.tween(fp, {x: 890}, 3, {ease: FlxEase.quadInOut}); 
+										FlxTween.tween(FlxG.camera, {zoom: 2.3}, 3, {
+											ease: FlxEase.quadInOut,
+											onComplete: function(twn:FlxTween)
+											{
+												FlxG.sound.music.fadeOut(1.8, 0);
+												FlxG.camera.fade(FlxColor.BLACK, 1.8, false, function()
+												{
+													MusicBeatState.switchState(new StoryMenuState());
+												});
+											}
+										});
 									case 'freeplay':
-										MusicBeatState.switchState(new FreeplayState());
+										FlxG.camera.follow(fp);
+										FlxG.sound.music.fadeOut(1.5, 0);
+										FlxTween.tween(fp, {x: -1000}, 1.3, {
+											ease: FlxEase.sineInOut,
+											onComplete: function(twn:FlxTween)
+											{
+												MusicBeatState.switchState(new FreeplayState());
+											}
+										});
+									#if MODS_ALLOWED
+									case 'mods':
+										MusicBeatState.switchState(new ModsMenuState());
+									#end
 									case 'awards':
 										MusicBeatState.switchState(new AchievementsMenuState());
 									case 'credits':
 										MusicBeatState.switchState(new CreditsState());
 									case 'options':
-										MusicBeatState.switchState(new OptionsState());
+										FlxG.camera.follow(fp);
+										transitioning = true;
+										FlxTransitionableState.skipNextTransIn = true;
+										FlxTransitionableState.skipNextTransOut = true;
+										FlxTween.tween(bg, {x: 1489}, 1.3, {ease: FlxEase.sineInOut});
+										FlxTween.tween(frontBG, {x: 1489}, 1.3, {ease: FlxEase.sineInOut});
+										FlxTween.tween(fp, {x: 2000}, 1.3, {
+											ease: FlxEase.sineInOut,
+											onComplete: function(twn:FlxTween)
+											{
+												MusicBeatState.switchState(new options.OptionsState());
+											}
+										});
 								}
 							});
 						}
 					});
 				}
 			}
+		}
 			else if (FlxG.keys.justPressed.SEVEN #if mobileC || _virtualpad.buttonC.justPressed #end)
 			{
 				selectedSomethin = true;
@@ -241,7 +358,6 @@ class MainMenuState extends MusicBeatState
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{
-			spr.screenCenter(X);
 		});
 	}
 
@@ -257,7 +373,6 @@ class MainMenuState extends MusicBeatState
 		menuItems.forEach(function(spr:FlxSprite)
 		{
 			spr.animation.play('idle');
-			spr.offset.y = 0;
 			spr.updateHitbox();
 
 			if (spr.ID == curSelected)
@@ -270,4 +385,13 @@ class MainMenuState extends MusicBeatState
 			}
 		});
 	}
+
+  #if ACHIEVEMENTS_ALLOWED
+  // Unlocks "Freaky on a Friday Night" achievement
+  function giveAchievement() {
+    add(new AchievementObject('aqui_esta_tu_vieja_mira_como_me_la_cacho'));
+    FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+    trace('Giving achievement "aqui_esta_tu_vieja_mira_como_me_la_cacho"');
+  }
+  #end
 }
