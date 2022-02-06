@@ -32,7 +32,7 @@ class MainMenuState extends MusicBeatState
 	private var camGame:FlxCamera;
 	private var camAchievement:FlxCamera;
 	
-	var optionShit:Array<String> = ['story_mode', 'freeplay', #if ACHIEVEMENTS_ALLOWED 'awards', #end 'credits', #if !switch 'donate', #end 'options'];
+	var optionShit:Array<String> = ['story_mode', 'freeplay',  'options'];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
@@ -144,23 +144,23 @@ class MainMenuState extends MusicBeatState
 		for (i in 0...optionShit.length)
 		{
 			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
-			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
+			var menuItem:FlxSprite = new FlxSprite(45, 170 + (i * 140)  + offset);
+			menuItem.scale.x = scale;
+			menuItem.scale.y = scale;
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
-			menuItem.screenCenter(X);
 			menuItems.add(menuItem);
 			var scr:Float = (optionShit.length - 4) * 0.135;
 			if(optionShit.length < 6) scr = 0;
 			menuItem.scrollFactor.set(0, scr);
 			menuItem.antialiasing = ClientPrefs.globalAntialiasing;
+			menuItem.scale.set(0.8, 0.8);
 			//menuItem.setGraphicSize(Std.int(menuItem.width * 0.58));
 			menuItem.updateHitbox();
 		}
-
-		FlxG.camera.follow(camFollowPos, null, 1);
 
 		// NG.core.calls.event.logEvent('swag').send();
 
