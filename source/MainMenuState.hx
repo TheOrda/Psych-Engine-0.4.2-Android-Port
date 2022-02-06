@@ -48,6 +48,8 @@ class MainMenuState extends MusicBeatState
 	
   public var transitioning:Bool = false;
 
+  var eee:Bool = true;
+  
 	override function create()
 	{
 		#if desktop
@@ -186,7 +188,7 @@ class MainMenuState extends MusicBeatState
 		var lerpVal:Float = CoolUtil.boundTo(elapsed * 5.6, 0, 1);
 		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
 		
-		if ()
+		if (eee)
 		{
 			var finalKey:FlxKey = FlxG.keys.firstJustPressed();
 			if(finalKey != FlxKey.NONE) {
