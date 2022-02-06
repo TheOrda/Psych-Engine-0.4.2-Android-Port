@@ -137,6 +137,8 @@ class MainMenuState extends MusicBeatState
 		magenta.color = 0xFFfd719b;
 		add(magenta);
 		// magenta.scrollFactor.set();
+		
+		var scale:Float = 1;
 
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
