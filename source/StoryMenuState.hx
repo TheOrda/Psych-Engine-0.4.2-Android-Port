@@ -41,7 +41,7 @@ class StoryMenuState extends MusicBeatState
 	private static var curWeek:Int = 0;
 
 	var txtTracklist:FlxText;
-	
+
 	var mapNum:Int = -1;
 
 	var grpWeekText:FlxTypedGroup<MenuItem>;
@@ -50,12 +50,12 @@ class StoryMenuState extends MusicBeatState
 	var grpLocks:FlxTypedGroup<FlxSprite>;
 
 	var difficultySelectors:FlxGroup;
-	var sprDifficultyGroup:FlxSprite;
+	var sprDifficulty:FlxSprite;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
-	
+
 	var canSelect:Bool = false;
-	
+
 	var map1:FlxSprite;
 	var mapNothing:FlxSprite;
 
