@@ -409,6 +409,7 @@ class StoryMenuState extends MusicBeatState
 		var leName:String = leWeek.storyName;
 		txtWeekTitle.text = leName.toUpperCase();
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
+	}
 
 		var bullShit:Int = 0;
 
@@ -444,6 +445,7 @@ class StoryMenuState extends MusicBeatState
 				}
 				--i;
 			}
+		}
 
 			if(diffs.length > 0 && diffs[0].length > 0)
 
