@@ -412,9 +412,9 @@ class StoryMenuState extends MusicBeatState
 	}
 
 		var bullShit:Int = 0;
-
+    {
 		for (item in grpWeekText.members)
-		{
+		
 			item.targetY = bullShit - curWeek;
 			if (item.targetY == Std.int(0) && !weekIsLocked(curWeek))
 				item.alpha = 1;
