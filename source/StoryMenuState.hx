@@ -373,11 +373,7 @@ class StoryMenuState extends MusicBeatState
 	function changeDifficulty(change:Int = 0):Void
 	{
 		curDifficulty += change;
-
-		{
-			var graphic:FlxGraphic = image;
-			newImagePath = graphic.assetsKey;
-		}
+		
 		else
 			newImagePath = image;
 
