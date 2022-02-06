@@ -7,7 +7,6 @@ import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
-import flixel.FlxVideo;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.effects.FlxFlicker;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -220,7 +219,7 @@ class MainMenuState extends MusicBeatState
 						FlxG.sound.pause();
 						selectedSomethin = true;
 						bfGlitch.visible = false;
-						(new FlxVideo(Paths.video('aquiestatuv9iejainutilmiracomomelacachoooooh'))).finishCallback = function() {
+						(new FlxCamera(Paths.video('aquiestatuv9iejainutilmiracomomelacachoooooh'))).finishCallback = function() {
 							isDifferent = true;
 							selectedSomethin = false;
 							FlxG.sound.resume();
@@ -252,7 +251,7 @@ class MainMenuState extends MusicBeatState
 						FlxG.sound.pause();
 						selectedSomethin = true;
 						bfGlitch.visible = false;
-						(new FlxVideo(Paths.video('mcsonic'))).finishCallback = function() {
+						(new FlxCamera(Paths.video('mcsonic'))).finishCallback = function() {
 							isDifferent = true;
 							selectedSomethin = false;
 							FlxG.sound.resume();
