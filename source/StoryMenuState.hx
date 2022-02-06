@@ -410,16 +410,6 @@ class StoryMenuState extends MusicBeatState
 		txtWeekTitle.text = leName.toUpperCase();
 		txtWeekTitle.x = FlxG.width - (txtWeekTitle.width + 10);
 	}
-
-		var bullShit:Int = 0;
-
-		bgSprite.visible = true;
-		var assetName:String = leWeek.weekBackground;
-		if(assetName == null || assetName.length < 1) {
-			bgSprite.visible = false;
-		} else {
-			bgSprite.loadGraphic(Paths.image('menubackgrounds/menu_' + assetName));
-		}
 		
 		PlayState.storyWeek = curWeek;
 
