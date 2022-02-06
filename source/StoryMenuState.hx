@@ -208,12 +208,12 @@ class StoryMenuState extends MusicBeatState
 		leftArrow.animation.play('idle');
 		leftArrow.antialiasing = ClientPrefs.globalAntialiasing;
 
-		CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
+		CoolUtil.Difficulty = CoolUtil.defaultDifficulty.copy();
 		if(lastDifficultyName == '')
 		{
 			lastDifficultyName = CoolUtil.defaultDifficulty;
 		}
-		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(lastDifficultyName)));
+		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulty.indexOf(lastDifficultyName)));
 		
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
@@ -356,7 +356,7 @@ class StoryMenuState extends MusicBeatState
 			PlayState.isStoryMode = true;
 			selectedWeek = true;
 
-			var diffic = CoolUtil.getDifficultyFilePath(curDifficulty);
+			var diffic = CoolUtil.difficultyStuff[curDifficulty][1];
 			if(diffic == null) diffic = '';
 
 			PlayState.storyDifficulty = curDifficulty;
@@ -384,11 +384,11 @@ class StoryMenuState extends MusicBeatState
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
-			curDifficulty = CoolUtil.difficulties.length-1;
-		if (curDifficulty >= CoolUtil.difficulties.length)
+			curDifficulty = CoolUtil.Difficulty.length-1;
+		if (curDifficulty >= CoolUtil.Difficulty.length)
 			curDifficulty = 0;
 
-		var image:Dynamic = Paths.image('menudifficulties/' + Paths.formatToSongPath(CoolUtil.difficulties[curDifficulty]));
+		var image:Dynamic = Paths.image('menuDifficulty/' + Paths.formatToSongPath(CoolUtil.Difficulty[curDifficulty]));
 		var newImagePath:String = '';
 		if(Std.isOfType(image, FlxGraphic))
 		{
@@ -413,7 +413,7 @@ class StoryMenuState extends MusicBeatState
 			}});
 		}
 		lastImagePath = newImagePath;
-		lastDifficultyName = CoolUtil.difficulties[curDifficulty];
+		lastDifficultyName = CoolUtil.Difficulty[curDifficulty];
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(WeekData.weeksList[curWeek], curDifficulty);
@@ -461,8 +461,8 @@ class StoryMenuState extends MusicBeatState
 		
 		PlayState.storyWeek = curWeek;
 
-		CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
-		var diffStr:String = WeekData.getCurrentWeek().difficulties;
+		CoolUtil.Difficulty = CoolUtil.defaultDifficulty.copy();
+		var diffStr:String = WeekData.getCurrentWeek().Difficulty;
 		if(diffStr != null && diffStr.length > 0)
 		{
 			var diffs:Array<String> = diffStr.split(',');
@@ -479,12 +479,12 @@ class StoryMenuState extends MusicBeatState
 
 			if(diffs.length > 0 && diffs[0].length > 0)
 			{
-				CoolUtil.difficulties = diffs;
+				CoolUtil.Difficulty = diffs;
 			}
 		}
 		
-		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
-		var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
+		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulty.indexOf(CoolUtil.defaultDifficulty)));
+		var newPos:Int = CoolUtil.Difficulty.indexOf(lastDifficultyName);
 		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
 		if(newPos > -1)
 		{
