@@ -372,12 +372,6 @@ class StoryMenuState extends MusicBeatState
 	var lastImagePath:String;
 	function changeDifficulty(change:Int = 0):Void
 	{
-		curDifficulty += change;
-		
-		else
-			newImagePath = image;
-
-		if(newImagePath != lastImagePath)
 		{
 			sprDifficulty.loadGraphic(image);
 			sprDifficulty.x = leftArrow.x + 60;
