@@ -50,6 +50,7 @@ class MainMenuState extends MusicBeatState
   public var transitioning:Bool = false;
 
   var eee:Bool = true;
+  var lkp:Array<FlxKey> = [];
   
 	override function create()
 	{
