@@ -219,7 +219,7 @@ class MainMenuState extends MusicBeatState
 						FlxG.sound.pause();
 						selectedSomethin = true;
 						bfGlitch.visible = false;
-						(new FlxCamera(Paths.camera('aquiestatuv9iejainutilmiracomomelacachoooooh'))).finishCallback = function() {
+						(new FlxSprite(Paths.image('aquiestatuv9iejainutilmiracomomelacachoooooh'))).finishCallback = function() {
 							isDifferent = true;
 							selectedSomethin = false;
 							FlxG.sound.resume();
@@ -251,7 +251,7 @@ class MainMenuState extends MusicBeatState
 						FlxG.sound.pause();
 						selectedSomethin = true;
 						bfGlitch.visible = false;
-						(new FlxCamera(Paths.camera('mcsonic'))).finishCallback = function() {
+						(new FlxSprite(Paths.image('mcsonic'))).finishCallback = function() {
 							isDifferent = true;
 							selectedSomethin = false;
 							FlxG.sound.resume();
