@@ -447,7 +447,6 @@ class StoryMenuState extends MusicBeatState
 
 			if(diffs.length > 0 && diffs[0].length > 0)
 		}
-		updateText();
 	}
 
 	function weekIsLocked(weekNum:Int) {
