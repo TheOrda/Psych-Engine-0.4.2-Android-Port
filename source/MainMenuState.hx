@@ -52,6 +52,10 @@ class MainMenuState extends MusicBeatState
   var eee:Bool = true;
   var lkp:Array<FlxKey> = [];
   
+  // secret codes
+	var tesla:Array<FlxKey> = [FlxKey.UP, FlxKey.UP, FlxKey.DOWN, FlxKey.DOWN, FlxKey.LEFT, FlxKey.RIGHT, FlxKey.LEFT, FlxKey.RIGHT, FlxKey.B, FlxKey.A, FlxKey.ENTER];
+	var sega:Array<FlxKey> = [FlxKey.M, FlxKey.C, FlxKey.S, FlxKey.E, FlxKey.G, FlxKey.A];
+  
 	override function create()
 	{
 		#if desktop
