@@ -255,8 +255,8 @@ class StoryMenuState extends MusicBeatState
 
 		if (!movedBack && !selectedWeek)
 		{
-			var upP = controls.UI.UP.P;
-			var downP = controls.UI.DOWN.P;
+			var upP = controls.UI_UP_P;
+			var downP = controls_UI_DOWN_P;
 			if (upP)
 			{
         FlxG.camera.shake(0.005, 0.3);
@@ -404,7 +404,7 @@ class StoryMenuState extends MusicBeatState
 			}});
 		}
 		lastImagePath = newImagePath;
-		lastDifficultyName = CoolUtil.difficulties[curDifficulty];
+		lastDifficultyName = CoolUtil.difficultyPath[curDifficulty];
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(WeekData.weeksList[curWeek], curDifficulty);
@@ -452,7 +452,7 @@ class StoryMenuState extends MusicBeatState
 		
 		PlayState.storyWeek = curWeek;
 		
-		var diffStr:String = WeekData.getCurrentWeek().difficulties;
+		var diffStr:String = WeekData.getCurrentWeek().difficultyPath;
 		if(diffStr != null) diffStr = diffStr.trim(); //Fuck you HTML5
 
 		if(diffStr != null && diffStr.length > 0)
@@ -475,7 +475,7 @@ class StoryMenuState extends MusicBeatState
 			}
 		}
 		
-		var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
+		var newPos:Int = CoolUtil.difficultyPath.indexOf(lastDifficultyName);
 		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
 		if(newPos > -1)
 		{
