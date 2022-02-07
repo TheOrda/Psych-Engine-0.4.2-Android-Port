@@ -12,6 +12,13 @@ import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.transition.TransitionData;
+import haxe.Json;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
+#if MODS_ALLOWED
+import sys.FileSystem;
+import sys.io.File;
+#end
 //import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
@@ -29,34 +36,84 @@ import lime.app.Application;
 import openfl.Assets;
 
 using StringTools;
-
+typedef TitleData =
+{
+	
+	titlex:Float,
+	titley:Float,
+	startx:Float,
+	starty:Float,
+	gfx:Float,
+	gfy:Float,
+	backgroundSprite:String,
+	bpm:Int
+}
 class TitleState extends MusicBeatState
 {
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
 
-	static var initialized:Bool = false;
+	public static var initialized:Bool = false;
 
 	var blackScreen:FlxSprite;
 	var credGroup:FlxGroup;
 	var credTextShit:Alphabet;
 	var textGroup:FlxGroup;
-	var logoSpr:FlxSprite;
+	var ngSpr:FlxSprite;
 
 	var curWacky:Array<String> = [];
 
 	var wackyImage:FlxSprite;
+
+	var bfScreamer:FlxSprite;
 
 	var easterEggEnabled:Bool = true; //Disable this to hide the easter egg
 	var easterEggKeyCombination:Array<FlxKey> = [FlxKey.B, FlxKey.B]; //bb stands for bbpanzu cuz he wanted this lmao
 	var lastKeysPressed:Array<FlxKey> = [];
 
 	var mustUpdate:Bool = false;
+	
+	var titleJSON:TitleData;
+	
 	public static var updateVersion:String = '';
 
 	override public function create():Void
 	{
+		#if MODS_ALLOWED
+		// Just to load a mod on start up if ya got one. For mods that change the menu music and bg
+		if (FileSystem.exists("modsList.txt")){
+			
+			var list:Array<String> = CoolUtil.listFromString(File.getContent("modsList.txt"));
+			var foundTheTop = false;
+			for (i in list){
+				var dat = i.split("|");
+				if (dat[1] == "1" && !foundTheTop){
+					foundTheTop = true;
+					Paths.currentModDirectory = dat[0];
+				}
+				
+			}
+		}
+		#end
+		
+		#if (desktop && MODS_ALLOWED)
+		var path = "mods/" + Paths.currentModDirectory + "/images/gfDanceTitle.json";
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)) {
+			path = "mods/images/gfDanceTitle.json";
+		}
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)) {
+			path = "assets/images/gfDanceTitle.json";
+		}
+		//trace(path, FileSystem.exists(path));
+		titleJSON = Json.parse(File.getContent(path));
+		#else
+		var path = Paths.getPreloadPath("images/gfDanceTitle.json");
+		titleJSON = Json.parse(Assets.getText(path)); 
+		#end
+		
 		#if android
 		FlxG.android.preventDefaultKeys = [BACK];
 		#end
@@ -104,6 +161,7 @@ class TitleState extends MusicBeatState
 		FlxG.sound.muteKeys = muteKeys;
 		FlxG.sound.volumeDownKeys = volumeDownKeys;
 		FlxG.sound.volumeUpKeys = volumeUpKeys;
+		FlxG.keys.preventDefaultKeys = [TAB];
 
 		PlayerSettings.init();
 
@@ -149,11 +207,14 @@ class TitleState extends MusicBeatState
 		#end
 	}
 
+	var background:FlxSprite;
 	var logoBl:FlxSprite;
 	var gfDance:FlxSprite;
 	var danceLeft:Bool = false;
 	var titleText:FlxSprite;
 	var swagShader:ColorSwap = null;
+	
+	var randomIp:Int = 0;
 
 	function startIntro()
 	{
@@ -183,54 +244,115 @@ class TitleState extends MusicBeatState
 			if(FlxG.sound.music == null) {
 				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
 
-				FlxG.sound.music.fadeIn(4, 0, 0.7);
+				FlxG.sound.music.fadeIn(1, 0, 1);
 			}
 		}
 
-		Conductor.changeBPM(102);
+		Conductor.changeBPM(121);
 		persistentUpdate = true;
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		var bg:FlxSprite = new FlxSprite()
+		
+		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none"){
+			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
+		}else{
+			bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		}
+		
 		// bg.antialiasing = ClientPrefs.globalAntialiasing;
 		// bg.setGraphicSize(Std.int(bg.width * 0.6));
 		// bg.updateHitbox();
-		add(bg);
 
-		logoBl = new FlxSprite(-150, -100);
+		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
+		
+		#if (desktop && MODS_ALLOWED)
+		var path = "mods/" + Paths.currentModDirectory + "/images/logoBumpin.png";
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "mods/images/logoBumpin.png";
+		}
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "assets/images/logoBumpin.png";
+		}
+		//trace(path, FileSystem.exists(path));
+		logoBl.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
+		#else
+		
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+		#end
+
+		background = new FlxSprite();
+		background.frames = Paths.getSparrowAtlas('glitch');
+		background.animation.addByPrefix('idle', 'glitch', 24);
+		background.animation.play('idle');
+		background.antialiasing = ClientPrefs.globalAntialiasing;
+		background.screenCenter();
+		background.updateHitbox();
+		background.alpha = 0;
+		add(background);
+
+		logoBl = new FlxSprite();
+		logoBl.frames = Paths.getSparrowAtlas('LogoBumpin');
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+		logoBl.animation.addByPrefix('bump', 'Symbol 11', 24);
 		logoBl.animation.play('bump');
+		logoBl.screenCenter();
+		logoBl.x -= 30;
+		logoBl.y -= 30;
 		logoBl.updateHitbox();
-		// logoBl.screenCenter();
-		// logoBl.color = FlxColor.BLACK;
+		logoBl.alpha = 0;
+		logoBl.scale.set(0.7, 0.7);
 
 		swagShader = new ColorSwap();
-		if(!FlxG.save.data.psykaEasterEgg || !easterEggEnabled) {
-			gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
-			gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
+			gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
+		
+		#if (desktop && MODS_ALLOWED)
+		var path = "mods/" + Paths.currentModDirectory + "/images/gfDanceTitle.png";
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "mods/images/gfDanceTitle.png";
+		//trace(path, FileSystem.exists(path));
+		}
+		if (!FileSystem.exists(path)){
+			path = "assets/images/gfDanceTitle.png";
+		//trace(path, FileSystem.exists(path));
+		}
+		gfDance.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
+		#else
+		
+		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
+		#end
 			gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 			gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		}
-		else //Psyka easter egg
-		{
-			gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.04);
-			gfDance.frames = Paths.getSparrowAtlas('psykaDanceTitle');
-			gfDance.animation.addByIndices('danceLeft', 'psykaDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-			gfDance.animation.addByIndices('danceRight', 'psykaDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		}
+	
 		gfDance.antialiasing = ClientPrefs.globalAntialiasing;
-		add(gfDance);
 		gfDance.shader = swagShader.shader;
 		add(logoBl);
 		//logoBl.shader = swagShader.shader;
 
-		titleText = new FlxSprite(100, FlxG.height * 0.8);
+		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
+		#if (desktop && MODS_ALLOWED)
+		var path = "mods/" + Paths.currentModDirectory + "/images/titleEnter.png";
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "mods/images/titleEnter.png";
+		}
+		//trace(path, FileSystem.exists(path));
+		if (!FileSystem.exists(path)){
+			path = "assets/images/titleEnter.png";
+		}
+		//trace(path, FileSystem.exists(path));
+		titleText.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path),File.getContent(StringTools.replace(path,".png",".xml")));
+		#else
+		
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
+		#end
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		titleText.antialiasing = ClientPrefs.globalAntialiasing;
 		titleText.animation.play('idle');
+		titleText.alpha = 0;
 		titleText.updateHitbox();
 		// titleText.screenCenter(X);
 		add(titleText);
@@ -257,13 +379,21 @@ class TitleState extends MusicBeatState
 
 		credTextShit.visible = false;
 
-		logoSpr = new FlxSprite(0, FlxG.height * 0.4).loadGraphic(Paths.image('titlelogo'));
-		add(logoSpr);
-		logoSpr.visible = false;
-		logoSpr.setGraphicSize(Std.int(logoSpr.width * 0.55));
-		logoSpr.updateHitbox();
-		logoSpr.screenCenter(X);
-		logoSpr.antialiasing = ClientPrefs.globalAntialiasing;
+		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		add(ngSpr);
+		ngSpr.visible = false;
+		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
+		ngSpr.updateHitbox();
+		ngSpr.screenCenter(X);
+		ngSpr.antialiasing = true;
+
+		bfScreamer = new FlxSprite().loadGraphic(Paths.image('bfDeadLOL'));
+		bfScreamer.antialiasing = ClientPrefs.globalAntialiasing;
+		bfScreamer.screenCenter();
+		bfScreamer.visible = false;
+		bfScreamer.updateHitbox();
+		bfScreamer.scale.set(1.7, 1.7);
+		add(bfScreamer);
 
 		FlxTween.tween(credTextShit, {y: credTextShit.y + 20}, 2.9, {ease: FlxEase.quadInOut, type: PINGPONG});
 
@@ -303,7 +433,7 @@ class TitleState extends MusicBeatState
 			FlxG.fullscreen = !FlxG.fullscreen;
 		}
 
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
+		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT;
 
 		#if mobile
 		for (touch in FlxG.touches.list)
@@ -373,7 +503,7 @@ class TitleState extends MusicBeatState
 							}
 						}
 
-						if(!isDifferent) {
+						/*if(!isDifferent) {
 							trace('Easter egg triggered!');
 							FlxG.save.data.psykaEasterEgg = !FlxG.save.data.psykaEasterEgg;
 							FlxG.sound.play(Paths.sound('secretSound'));
@@ -392,7 +522,7 @@ class TitleState extends MusicBeatState
 							lastKeysPressed = [];
 							closedState = true;
 							transitioning = true;
-						}
+						}*/
 					}
 				}
 			}
@@ -400,7 +530,6 @@ class TitleState extends MusicBeatState
 
 		if (pressedEnter && !skippedIntro)
 		{
-			skipIntro();
 		}
 
 		if(swagShader != null)
@@ -419,14 +548,16 @@ class TitleState extends MusicBeatState
 			var money:Alphabet = new Alphabet(0, 0, textArray[i], true, false);
 			money.screenCenter(X);
 			money.y += (i * 60) + 200 + offset;
-			credGroup.add(money);
-			textGroup.add(money);
+			if(credGroup != null && textGroup != null) {
+			  credGroup.add(money);
+			  textGroup.add(money);
+			}
 		}
 	}
 
 	function addMoreText(text:String, ?offset:Float = 0)
 	{
-		if(textGroup != null) {
+		if(textGroup != null && credGroup != null) {
 			var coolText:Alphabet = new Alphabet(0, 0, text, true, false);
 			coolText.screenCenter(X);
 			coolText.y += (textGroup.length * 60) + 200 + offset;
@@ -445,13 +576,13 @@ class TitleState extends MusicBeatState
 	}
 
 	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
-	private static var closedState:Bool = false;
+	public static var closedState:Bool = false;
 	override function beatHit()
 	{
 		super.beatHit();
 
 		if(logoBl != null) 
-			logoBl.animation.play('bump');
+			logoBl.animation.play('bump', true);
 
 		if(gfDance != null) {
 			danceLeft = !danceLeft;
@@ -467,11 +598,20 @@ class TitleState extends MusicBeatState
 			switch (sickBeats)
 			{
 				case 1:
-					createCoolText(['Psych Engine by'], 45);
+					#if PSYCH_WATERMARKS
+					createCoolText(['Psych Engine by'], 15);
+					#else
+					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
+					#end
 				// credTextShit.visible = true;
 				case 3:
-					addMoreText('Shadow Mario', 45);
-					addMoreText('RiverOaken', 45);
+					#if PSYCH_WATERMARKS
+					addMoreText('Shadow Mario', 15);
+					addMoreText('RiverOaken', 15);
+					addMoreText('bb-panzu', 15);
+					#else
+					addMoreText('present');
+					#end
 				// credTextShit.text += '\npresent...';
 				// credTextShit.addText();
 				case 4:
@@ -480,39 +620,34 @@ class TitleState extends MusicBeatState
 				// credTextShit.text = 'In association \nwith';
 				// credTextShit.screenCenter();
 				case 5:
-					createCoolText(['This is a mod to'], -60);
+					#if PSYCH_WATERMARKS
+					createCoolText(['Not associated', 'with'], -40);
+					#else
+					createCoolText(['In association', 'with'], -40);
+					#end
 				case 7:
-					addMoreText('This game right below lol', -60);
-					logoSpr.visible = true;
+					addMoreText('newgrounds', -40);
+					ngSpr.visible = true;
 				// credTextShit.text += '\nNewgrounds';
 				case 8:
 					deleteCoolText();
-					logoSpr.visible = false;
+					ngSpr.visible = false;
 				// credTextShit.visible = false;
 
 				// credTextShit.text = 'Shoutouts Tom Fulp';
 				// credTextShit.screenCenter();
 				case 9:
-					createCoolText([curWacky[0]]);
-				// credTextShit.visible = true;
-				case 11:
-					addMoreText(curWacky[1]);
-				// credTextShit.text += '\nlmao';
-				case 12:
-					deleteCoolText();
-				// credTextShit.visible = false;
-				// credTextShit.text = "Friday";
-				// credTextShit.screenCenter();
-				case 13:
-					addMoreText('Friday');
-				// credTextShit.visible = true;
-				case 14:
-					addMoreText('Night');
-				// credTextShit.text += '\nNight';
-				case 15:
-					addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
-
-				case 16:
+				var randoTexto = FlxG.random.getObject([['Pou best game'], ["compota le gana"], 
+					["Dont draw porn"], ['boo'], ['jugamos unos free?'], ['thanks pablo for be a chad'], ['ash', 'my beloved'],
+					['pls ash marry with me'], ['mrz furry', 'furry mrz'], ['your mom when', 'me when mom your', 'your mom and me when',
+					'me when mom your', 'you and my mom', 'your when and me', 'when your mom and me'], ['royal made this lol'],
+					['bro?'], ['Donut como vas?'], ['no me banen de undersoul'], ['sauris drip'], ['SQUID GAMES!!', 'SQUID GAMES!!'],
+					['el pepe', 'ete sech', 'potaxio', 'eso tilin'], ['tu madre tiene una polla'],
+					['momichi god'], ['hoooooog rideeeeeeer'], ['jijijija', 'grrrr'], 
+					['42.81.1.108'], ['65.105.227.155'], ['167.17.29.152'], ['91.218.151.123'], ['135.43.210.247'], //There are randoms btw
+					['burandecuin']]);
+					createCoolText(randoTexto);
+				case 10:
 					skipIntro();
 			}
 		}
@@ -524,9 +659,21 @@ class TitleState extends MusicBeatState
 	{
 		if (!skippedIntro)
 		{
-			remove(logoSpr);
+			remove(ngSpr);
+			Conductor.changeBPM(61);
 
-			FlxG.camera.flash(FlxColor.WHITE, 4);
+			FlxG.camera.shake(0.03, 1.5);
+			bfScreamer.visible = true;
+
+			FlxG.sound.music.time = 6950;
+			new FlxTimer().start(0.8, function(tmr:FlxTimer)
+			{
+				FlxTween.tween(bfScreamer, {alpha: 0}, 1, {ease: FlxEase.quadInOut});
+			});
+
+			FlxTween.tween(background, {alpha: 0.8}, 4, {ease: FlxEase.quadInOut});
+			FlxTween.tween(logoBl, {alpha: 1}, 5, {ease: FlxEase.quadInOut});
+			FlxTween.tween(titleText, {alpha: 1}, 5, {ease: FlxEase.quadInOut});
 			remove(credGroup);
 			skippedIntro = true;
 		}
