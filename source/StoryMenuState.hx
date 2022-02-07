@@ -205,8 +205,6 @@ class StoryMenuState extends MusicBeatState
 		leftArrow.animation.play('idle');
 		leftArrow.antialiasing = ClientPrefs.globalAntialiasing;
 
-		sprDifficultyGroup = new FlxTypedGroup<FlxSprite>();
-
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
 		changeDifficulty();
@@ -256,7 +254,7 @@ class StoryMenuState extends MusicBeatState
 		if (!movedBack && !selectedWeek)
 		{
 			var upP = controls.UI_UP_P;
-			var downP = controls_UI_DOWN_P;
+			var downP = controls.UI_DOWN_P;
 			if (upP)
 			{
         FlxG.camera.shake(0.005, 0.3);
@@ -404,7 +402,7 @@ class StoryMenuState extends MusicBeatState
 			}});
 		}
 		lastImagePath = newImagePath;
-		lastDifficultyName = CoolUtil.difficultyPath[curDifficulty];
+		lastDifficultyName = CoolUtil.difficultyStuff[curDifficulty];
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(WeekData.weeksList[curWeek], curDifficulty);
@@ -452,7 +450,7 @@ class StoryMenuState extends MusicBeatState
 		
 		PlayState.storyWeek = curWeek;
 		
-		var diffStr:String = WeekData.getCurrentWeek().difficultyPath;
+		var diffStr:String = WeekData.getCurrentWeek().difficultyStuff;
 		if(diffStr != null) diffStr = diffStr.trim(); //Fuck you HTML5
 
 		if(diffStr != null && diffStr.length > 0)
@@ -475,7 +473,7 @@ class StoryMenuState extends MusicBeatState
 			}
 		}
 		
-		var newPos:Int = CoolUtil.difficultyPath.indexOf(lastDifficultyName);
+		var newPos:Int = CoolUtil.difficultyStuff.indexOf(lastDifficultyName);
 		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
 		if(newPos > -1)
 		{
