@@ -450,10 +450,6 @@ class StoryMenuState extends MusicBeatState
 		
 		PlayState.storyWeek = curWeek;
 		
-		var diffStr:String = WeekData.getCurrentWeek().difficultyStuff;
-		if(diffStr != null) diffStr = diffStr.trim(); //Fuck you HTML5
-
-		if(diffStr != null && diffStr.length > 0)
 		{
 			var diffs:Array<String> = diffStr.split(',');
 			var i:Int = diffs.length - 1;
