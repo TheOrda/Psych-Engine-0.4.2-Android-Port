@@ -197,7 +197,11 @@ class PlayState extends MusicBeatState
 	var phillyCityLightsEvent:FlxTypedGroup<BGSprite>;
 	var phillyCityLightsEventTween:FlxTween;
 	var trainSound:FlxSound;
-
+	
+	var tower:FlxSprite;
+	var smokeRight:FlxSprite;
+	var smokeLeft:FlxSprite;
+	
 	var limoKillingState:Int = 0;
 	var limo:BGSprite;
 	var limoMetalPole:BGSprite;
