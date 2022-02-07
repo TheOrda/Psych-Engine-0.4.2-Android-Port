@@ -3,6 +3,7 @@ package;
 #if desktop
 import Discord.DiscordClient;
 #end
+import editors.ChartingState;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -13,10 +14,14 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
 import lime.utils.Assets;
 import flixel.system.FlxSound;
 import openfl.utils.Assets as OpenFlAssets;
 import WeekData;
+#if MODS_ALLOWED
+import sys.FileSystem;
+#end
 
 using StringTools;
 
@@ -26,7 +31,8 @@ class FreeplayState extends MusicBeatState
 
 	var selector:FlxText;
 	private static var curSelected:Int = 0;
-	private static var curDifficulty:Int = 1;
+	var curDifficulty:Int = -1;
+	private static var lastDifficultyName:String = '';
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
@@ -45,6 +51,8 @@ class FreeplayState extends MusicBeatState
 	var intendedColor:Int;
 	var colorTween:FlxTween;
 
+	public var fp:FlxSprite;
+
 	override function create()
 	{
     #if MODS_ALLOWED
@@ -57,7 +65,7 @@ class FreeplayState extends MusicBeatState
 		#end
 		
 		FlxG.sound.music.fadeIn(1, 0, 0.7);
-		Flx.sound.playMusic(Paths.music('freeplay'), 0);
+		FlxG.sound.playMusic(Paths.music('freeplay'), 0);
 
 		for (i in 0...WeekData.weeksList.length) {
 			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
