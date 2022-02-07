@@ -450,25 +450,6 @@ class StoryMenuState extends MusicBeatState
 		
 		PlayState.storyWeek = curWeek;
 		
-		{
-			var diffs:Array<String> = diffStr.split(',');
-			var i:Int = diffs.length - 1;
-			while (i > 0)
-			{
-				if(diffs[i] != null)
-				{
-					diffs[i] = diffs[i].trim();
-					if(diffs[i].length < 1) diffs.remove(diffs[i]);
-				}
-				--i;
-			}
-
-			if(diffs.length > 0 && diffs[0].length > 0)
-			{
-				CoolUtil.difficultyStuff = diffs;
-			}
-		}
-		
 		var newPos:Int = CoolUtil.difficultyStuff.indexOf(lastDifficultyName);
 		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
 		if(newPos > -1)
