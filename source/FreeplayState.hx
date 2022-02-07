@@ -3,7 +3,6 @@ package;
 #if desktop
 import Discord.DiscordClient;
 #end
-import editors.ChartingState;
 import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -14,14 +13,10 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
-import flixel.tweens.FlxEase;
 import lime.utils.Assets;
 import flixel.system.FlxSound;
 import openfl.utils.Assets as OpenFlAssets;
 import WeekData;
-#if MODS_ALLOWED
-import sys.FileSystem;
-#end
 
 using StringTools;
 
@@ -31,8 +26,7 @@ class FreeplayState extends MusicBeatState
 
 	var selector:FlxText;
 	private static var curSelected:Int = 0;
-	var curDifficulty:Int = -1;
-	private static var lastDifficultyName:String = '';
+	private static var curDifficulty:Int = 1;
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
@@ -51,24 +45,19 @@ class FreeplayState extends MusicBeatState
 	var intendedColor:Int;
 	var colorTween:FlxTween;
 
-	public var fp:FlxSprite;
-
 	override function create()
 	{
     #if MODS_ALLOWED
 		Paths.destroyLoadedImages();
  		#end	
- 		
- 		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
-		
 		#if desktop
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 		
 		FlxG.sound.music.fadeIn(1, 0, 0.7);
-		FlxG.sound.playMusic(Paths.music('freeplay'), 0);
+		Flx.sound.playMusic(Paths.music('freeplay'), 0);
 
 		for (i in 0...WeekData.weeksList.length) {
 			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
@@ -90,14 +79,14 @@ class FreeplayState extends MusicBeatState
 		}
 		WeekData.setDirectoryFromWeek();
 
-		/*var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
+		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 		for (i in 0...initSonglist.length)
 		{
 			if(initSonglist[i] != null && initSonglist[i].length > 0) {
 				var songArray:Array<String> = initSonglist[i].split(":");
 				addSong(songArray[0], 0, songArray[1], Std.parseInt(songArray[2]));
 			}
-		}*/
+		}
 
 		// LOAD MUSIC
 
@@ -105,12 +94,11 @@ class FreeplayState extends MusicBeatState
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
-		add(bg);
 
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 		
-	 fp = new FlxSprite(2000, 190).loadGraphic(Paths.image('mainmenu/followPoint'));
+		fp = new FlxSprite(2000, 190).loadGraphic(Paths.image('mainmenu/followPoint'));
 		fp.updateHitbox();
 		fp.antialiasing = ClientPrefs.globalAntialiasing;
 		add(fp);
@@ -127,7 +115,8 @@ class FreeplayState extends MusicBeatState
 			songText.targetY = i;
 			grpSongs.add(songText);
 
-			Paths.currentModDirectory = songs[i].folder;
+			Paths.currentModDirectory = songs[i].folder;			
+
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
 			icon.sprTracker = songText;
 
@@ -156,17 +145,6 @@ class FreeplayState extends MusicBeatState
 		if(curSelected >= songs.length) curSelected = 0;
 		bg.color = songs[curSelected].color;
 		intendedColor = bg.color;
-		
-		if(curSelected >= songs.length) curSelected = 0;
-		bg.color = songs[curSelected].color;
-		intendedColor = bg.color;
-
-		if(lastDifficultyName == '')
-		{
-			lastDifficultyName = CoolUtil.defaultDifficulty;
-		}
-		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(lastDifficultyName)));
-		
 		changeSelection();
 		changeDiff();
 
@@ -192,7 +170,7 @@ class FreeplayState extends MusicBeatState
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
 		textBG.alpha = 0.6;
 		add(textBG);
-		
+		#if desktop
 			#if PRELOAD_ALL
 			var leText:String = "Press SPACE to listen to this Song / Press RESET to Reset your Score and Accuracy.";
 			#else
@@ -218,7 +196,7 @@ class FreeplayState extends MusicBeatState
 	}
 
 	override function closeSubState() {
-		changeSelection(0, false);
+		changeSelection();
 		super.closeSubState();
 	}
 
