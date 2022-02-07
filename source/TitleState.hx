@@ -251,14 +251,11 @@ class TitleState extends MusicBeatState
 		Conductor.changeBPM(121);
 		persistentUpdate = true;
 
-		var bg:FlxSprite = new FlxSprite()
+		var bg:FlxSprite = new FlxSprite();
 		
-		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none");
-		 {
+		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != "none"){
 			bg.loadGraphic(Paths.image(titleJSON.backgroundSprite));
-		 }
-		else
-		{
+		}else{
 			bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		}
 		
