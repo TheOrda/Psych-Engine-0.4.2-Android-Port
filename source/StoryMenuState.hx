@@ -248,7 +248,6 @@ class StoryMenuState extends MusicBeatState
 		if(Math.abs(intendedScore - lerpScore) < 10) lerpScore = intendedScore;
 
 		scoreText.text = "WEEK SCORE:" + lerpScore;
-	}
 
 		// FlxG.watch.addQuick('font', scoreText.font);
 
@@ -295,6 +294,7 @@ class StoryMenuState extends MusicBeatState
 				openSubState(new ResetScoreSubState('', curDifficulty, '', curWeek));
 				//FlxG.sound.play(Paths.sound('scrollMenu'));
 			}
+		}
 		  else if (controls.ACCEPT && canSelect)
 		  {
 		    selectWeek();
